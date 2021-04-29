@@ -1,4 +1,5 @@
 package uiDesign;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -10,6 +11,8 @@ import javax.swing.text.DateFormatter;
 
 public class Screen
 {
+	private static TST tst;
+	
 	private static JFrame frame;
 	private JTabbedPane tabbedPane;
 	private JPanel tripSearchPanel;
@@ -27,29 +30,14 @@ public class Screen
 	
 	public Screen()
 	{
-		String testingString[] = {
-			"From",
-			"item 2",
-			"we got to item 3",
-			"and theres this one",
-			"last one coming up",
-			"lets go",
-			"0",
-			"1",
-			"2",
-			"3",
-			"4",
-			"5",
-			"6",
-			"7",
-			"8",
-			"9",
-			"10"
-		};
+		String startStr[] = {"Stop from"};
+		String stopStr[] = {"Stop to"};
+		String busStopStr[] = {"Bus Stop"};
 		
 		JPanel topPanel = new JPanel();		
 		
-		startInput = new JComboBox<Object>(testingString);
+		startInput = new JComboBox<Object>(startStr);
+		startInput.setPreferredSize(new Dimension(300, 25));
 		startInput.setEditable(true);
 		startInput.addActionListener(new startListener());
 		topPanel.add(startInput);
@@ -57,7 +45,8 @@ public class Screen
 		toLabel = new JLabel("to");
 		topPanel.add(toLabel);
 		
-		endInput = new JComboBox<Object>(testingString);
+		endInput = new JComboBox<Object>(stopStr);
+		endInput.setPreferredSize(new Dimension(300, 25));
 		endInput.setEditable(true);
 		endInput.addActionListener(new endListener());
 		topPanel.add(endInput);
@@ -85,7 +74,7 @@ public class Screen
 		tripSearchPanel.add(tablePanel);
 		
 		busSearchPanel = new JPanel();
-		busStopInput = new JComboBox<Object>(testingString);
+		busStopInput = new JComboBox<Object>(busStopStr);
 		busStopInput.setEditable(true);
 		busStopInput.addActionListener(new busStopListener());
 		busSearchPanel.setLayout(new GridLayout(4, 0));
@@ -130,7 +119,8 @@ public class Screen
 	
 	private class timeButtonListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
-			
+			System.out.print(e);
+			// TODO: interface with rest of program
 		}
 	}
 	
@@ -138,14 +128,9 @@ public class Screen
 		public void actionPerformed(ActionEvent e) {
 			if (e.getActionCommand() == "comboBoxEdited")
 			{
-				String searchItem = (String) startInput.getSelectedItem();
-				System.out.println("get stop of [" + searchItem + "]");
-				//TODO: interface with 'match' function to search for stop
-				//TODO: update stop data of start with results
-				// EG:
-				String columnNames[] = {"Stop", "trip id", "stop #", "time", "new info"};
-				setStartData(columnNames);
-				// end EG
+				String searchItem = ((String) startInput.getSelectedItem()).toUpperCase();
+				Object result[] = tst.search(searchItem).toArray();
+				setStartData(result);
 				startInput.showPopup();
 			}
 		}
@@ -155,10 +140,9 @@ public class Screen
 		public void actionPerformed(ActionEvent e) {
 			if (e.getActionCommand() == "comboBoxEdited")
 			{
-				String searchItem = (String) endInput.getSelectedItem();
-				System.out.println("get stop of [" + searchItem + "]");
-				//TODO: interface with 'match' function to search for stop
-				//TODO: update stop data of end with results
+				String searchItem = ((String) endInput.getSelectedItem()).toUpperCase();
+				Object result[] = tst.search(searchItem).toArray();
+				setEndData(result);
 				endInput.showPopup();
 			}
 		}
@@ -168,10 +152,10 @@ public class Screen
 		public void actionPerformed(ActionEvent e) {
 			if (e.getActionCommand() == "comboBoxEdited")
 			{
-				String searchItem = (String) busStopInput.getSelectedItem();
+				String searchItem = ((String) busStopInput.getSelectedItem()).toUpperCase();
 				System.out.println("get stop of [" + searchItem + "]");
-				//TODO: interface with 'match' function to search for stop
-				//TODO: update stop data of end with results
+				Object result[] = tst.search(searchItem).toArray();
+				setBusStopData(result);
 				busStopInput.showPopup();
 			}
 		}
@@ -211,6 +195,7 @@ public class Screen
 	
 	public static void main(String[] args)
 	{
+		tst = new TST("stops.txt");
 		Screen gui = new Screen();
 		frame = new JFrame();
 
