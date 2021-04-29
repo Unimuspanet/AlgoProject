@@ -3,6 +3,12 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 import java.util.ArrayList;
 
+/*
+ *Ternary search tree (TST), takes in file of stops 
+ *(moves keywords to provide meaningful searh functionality)
+ *returns the full stop information for each stop matching 
+ *input by returning an arraylist.
+ */
 public class TST {
 
     /*
@@ -179,6 +185,9 @@ public class TST {
 
                     stop_name = stop_name.substring(3).concat(" " +first_word);
 
+                }
+                else if(stop_name.substring(0,8).equals("FLAGSTOP")){
+                    stop_name = stop_name.substring(9).concat(" " + "FLAGSTOP");
                 }
 
                 add(stop_name.toCharArray());
