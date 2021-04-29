@@ -14,14 +14,16 @@ public class Screen
 	private JTabbedPane tabbedPane;
 	private JPanel tripSearchPanel;
 	private JPanel busSearchPanel;
+	private JPanel timeSearchPanel;
 	private JComboBox<Object> busStopInput;
 	private JComboBox<Object> startInput;
 	private JComboBox<Object> endInput;
 	private JLabel toLabel;
-	private JLabel atLabel;
 	private JSpinner timeSelecter;
 	private JButton goButton;
+	private JButton goTimeButton;
 	private JTable table;
+	private JTable timeTable;
 	
 	public Screen()
 	{
@@ -60,18 +62,6 @@ public class Screen
 		endInput.addActionListener(new endListener());
 		topPanel.add(endInput);
 		
-		atLabel = new JLabel("at");
-		topPanel.add(atLabel);
-		
-		SpinnerDateModel model = new SpinnerDateModel();
-		timeSelecter = new JSpinner(model);
-		JSpinner.DateEditor editor = new JSpinner.DateEditor(timeSelecter, "HH:mm:ss");
-		DateFormatter formatter = (DateFormatter)editor.getTextField().getFormatter();
-		formatter.setAllowsInvalid(false);
-		formatter.setOverwriteMode(true);
-		timeSelecter.setEditor(editor);
-		topPanel.add(timeSelecter);
-		
 		goButton = new JButton("go!");
 		goButton.addActionListener(new buttonListener());
 		topPanel.add(goButton);
@@ -101,22 +91,46 @@ public class Screen
 		busSearchPanel.setLayout(new GridLayout(4, 0));
 		busSearchPanel.add(busStopInput);
 		
+		SpinnerDateModel model = new SpinnerDateModel();
+		timeSelecter = new JSpinner(model);
+		JSpinner.DateEditor editor = new JSpinner.DateEditor(timeSelecter, "HH:mm:ss");
+		DateFormatter formatter = (DateFormatter)editor.getTextField().getFormatter();
+		formatter.setAllowsInvalid(false);
+		formatter.setOverwriteMode(true);
+		timeSelecter.setEditor(editor);
+		JPanel timeTopPanel = new JPanel();
+		timeTopPanel.add(timeSelecter);
+		goTimeButton = new JButton("go!");
+		goTimeButton.addActionListener(new timeButtonListener());
+		timeTopPanel.add(goTimeButton);
+		
+		timeTable = new JTable(data, columnNames);
+		JScrollPane timeScrollPane = new JScrollPane(timeTable);
+		
+		timeSearchPanel = new JPanel();
+		timeSearchPanel.setLayout(new BoxLayout(timeSearchPanel, BoxLayout.Y_AXIS));
+		timeSearchPanel.add(timeTopPanel);
+		timeSearchPanel.add(timeScrollPane);
+		
 		tabbedPane = new JTabbedPane();
-		//tabbedPane.setBounds(0, 0, 1000, 1000);
-		//tabbedPane.set
 		tabbedPane.addTab("Trip Search", null, tripSearchPanel, "Search for the shortest trip between two stops");
 		tabbedPane.addTab("Bus Stop Search", null, busSearchPanel, "Search for information about a particular bus stop");
+		tabbedPane.addTab("Time Search", null, timeSearchPanel, "Search for stop changes based on a time");
 	}
 	
 	private class buttonListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 			Object startStop = startInput.getSelectedItem();
 			Object endStop = endInput.getSelectedItem();
-			Object time = timeSelecter.getValue();
 			System.out.println("startStop: " + startStop);
 			System.out.println("endStop: " + endStop);
-			System.out.println("time: " + time);
 			// TODO: interface with rest of program
+		}
+	}
+	
+	private class timeButtonListener implements ActionListener {
+		public void actionPerformed(ActionEvent e) {
+			
 		}
 	}
 	
@@ -163,9 +177,17 @@ public class Screen
 		}
 	}
 	
-	public void setTableInformation(Object data[][], Object columnNames[]) {
+	public void setTableInformation(Object data[][], Object columnNames[])
+	{
 		DefaultTableModel model = new DefaultTableModel(data, columnNames);
 		table.setModel(model);
+		model.fireTableDataChanged();
+	}
+	
+	public void setTimeTableInformation(Object data[][], Object columnNames[])
+	{
+		DefaultTableModel model = new DefaultTableModel(data, columnNames);
+		timeTable.setModel(model);
 		model.fireTableDataChanged();
 	}
 	
@@ -190,13 +212,12 @@ public class Screen
 	public static void main(String[] args)
 	{
 		Screen gui = new Screen();
-		frame = new JFrame();			//creating instance of JFrame
+		frame = new JFrame();
 
 		frame.setLayout(new GridLayout());
 		frame.getContentPane().add(gui.tabbedPane);
 		frame.pack();
-		//frame.setSize(1000, 1000);
-		frame.setVisible(true);				//making the frame visible
+		frame.setVisible(true);
 		
 		String columnNames[] = {"Stop", "trip id", "stop #", "time", "new info"};
 		Object data[][] = {
