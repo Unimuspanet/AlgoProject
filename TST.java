@@ -100,7 +100,9 @@ public class TST {
     }
     
     
-    
+    /*
+     * easy access to find relating stopID from the exact stop name
+    */
     public String getStopId(String input) {
         Node matching_string = search(input.toCharArray(), 0, root);
         if(is_word_match) {
@@ -111,7 +113,10 @@ public class TST {
         return null;
     }
     
-
+    /*
+     * Provide a arraylist of strings filled with all the matches
+     * of the input as well as their corresponding information
+     */
     public ArrayList<String[]> searchForDetails (String input){
 
         is_word_match = false;
@@ -123,40 +128,14 @@ public class TST {
             search_name_matches.add(input);
 
         if (origin != null){
-            matchst("", origin.middle, search_name_matches, search_detail_matches);
-            
+            matchDetails("", origin.middle, search_name_matches, search_detail_matches);
         }
 
         return search_detail_matches;
     
     }
-    
-    public ArrayList<String> searchForNameWithId (String input){
 
-        is_word_match = false;
-        ArrayList<String> search_name_matches = new ArrayList<String>();
-        ArrayList<String[]> search_detail_matches = new ArrayList<String[]>();
-        Node origin = search(input.toCharArray(), 0, root);
 
-        if (is_word_match)
-            search_name_matches.add(input);
-
-        if (origin != null){
-            matchst("", origin.middle, search_name_matches, search_detail_matches);
-            
-            for (int i = (is_word_match?1:0); i < search_name_matches.size(); i++) {
-                String[]current_details = search_detail_matches.get(i);
-                search_name_matches.set( i, current_details[0] + "," + input + search_name_matches.get(i));
-            }
-        }
-
-        return search_name_matches;
-    
-    }
-    
-    public static void main(String[] args) {
-        
-    }
     /*
      * search functions first look for matching words, and
      * then look for the corresponding nodes to place in 
@@ -218,13 +197,13 @@ public class TST {
         }
     }
     
-    private void matchst(String first_word, Node node, ArrayList<String> matches, ArrayList<String[]> details) {
+    private void matchDetails(String first_word, Node node, ArrayList<String> matches, ArrayList<String[]> details) {
 
          if (node != null)
          {
-                 matchst( first_word, node.left, matches, details);
-                 matchst( first_word+node.key, node.middle, matches, details);
-                 matchst( first_word,node.right, matches, details);
+                 matchDetails( first_word, node.left, matches, details);
+                 matchDetails( first_word+node.key, node.middle, matches, details);
+                 matchDetails( first_word,node.right, matches, details);
 
                  if ( node.value != -1 )
                  {
