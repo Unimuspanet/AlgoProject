@@ -1,4 +1,4 @@
-# AlgoProject
+# [AlgoProject](https://github.com/Unimuspanet/AlgoProject)
 CSU 22012 Data Structures and Algorithms group project
 
 ## Group Members:
