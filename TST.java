@@ -19,7 +19,7 @@ public class TST {
         private char key;           
         private int value;
         private Node right, left, middle; 
-        private StopInfo stop_info;
+        private StopDetails stop_details;
 
         public Node(char key, int value) {
             this.key = key;
@@ -27,37 +27,24 @@ public class TST {
             this.right = null;
             this.left = null;
             this.middle = null;
-            this.stop_info = null;
+            this.stop_details = null;
         }
 
         public void setValue(int value) {
             this.value = value;
         }
-        public void setStopInfo(StopInfo info) {
-        	this.stop_info = info;
+        public void setStopDetails(StopDetails info) {
+            this.stop_details = info;
         }
     }
     
-    protected class StopInfo {
-		protected String stop_id,stop_code,stop_name,stop_desc,stop_lat,stop_lon,zone_id,stop_url,location_type,parent_station;
-		protected String[] details;
+    protected class StopDetails {
+        protected String[] details;
 
-		protected StopInfo( String[] deliminated_info ) {
-			details = deliminated_info;
-			
-			stop_id = deliminated_info[0];
-			stop_code = deliminated_info[1];
-			stop_name = deliminated_info[2];
-			stop_desc = deliminated_info[3];
-			stop_lat = deliminated_info[4];
-			stop_lon = deliminated_info[5];
-			zone_id = deliminated_info[6];
-			stop_url = deliminated_info[7];
-            location_type = deliminated_info[8];
-            parent_station = deliminated_info[9];
-
-		}             
-	}
+        protected StopDetails( String[] deliminated_info ) {
+            details = deliminated_info;
+        }             
+    }
 
     private Node root;
     private boolean is_complete;
@@ -68,7 +55,7 @@ public class TST {
      * add functions allow for the stop to be correctly
      * placed within the tree
      */    
-    private void add (char[] stop_name, StopInfo info) {
+    private void add (char[] stop_name, StopDetails info) {
 
          if (stop_name.length != 0){
              if (root == null)
@@ -78,7 +65,7 @@ public class TST {
          }    
      }
 
-     private Node add (char[] stop_name, int i, Node node,  StopInfo info) {
+     private Node add (char[] stop_name, int i, Node node,  StopDetails info) {
          
          if (node == null) 
              node = new Node( stop_name[i], -1);
@@ -94,7 +81,7 @@ public class TST {
 
          if (i == stop_name.length - 1 && !is_complete){
              node.setValue(i);
-             node.setStopInfo(info);
+             node.setStopDetails(info);
              is_complete = true;
          }
          
@@ -115,10 +102,13 @@ public class TST {
     
     
     public String getStopId(String input) {
-    	Node matching_string = search(input.toCharArray(), 0, root);
-    	if(is_word_match)
-    		return matching_string.stop_info.stop_id;
-    	return null;
+        Node matching_string = search(input.toCharArray(), 0, root);
+        if(is_word_match) {
+        	StopDetails stop = matching_string.stop_details;
+        	return stop.details[0];
+        }
+        
+        return null;
     }
     
 
@@ -155,7 +145,7 @@ public class TST {
             matchst("", origin.middle, search_name_matches, search_detail_matches);
             
             for (int i = (is_word_match?1:0); i < search_name_matches.size(); i++) {
-            	String[]current_details = search_detail_matches.get(i);
+                String[]current_details = search_detail_matches.get(i);
                 search_name_matches.set( i, current_details[0] + "," + input + search_name_matches.get(i));
             }
         }
@@ -165,7 +155,7 @@ public class TST {
     }
     
     public static void main(String[] args) {
-    	
+        
     }
     /*
      * search functions first look for matching words, and
@@ -230,7 +220,7 @@ public class TST {
     
     private void matchst(String first_word, Node node, ArrayList<String> matches, ArrayList<String[]> details) {
 
-    	 if (node != null)
+         if (node != null)
          {
                  matchst( first_word, node.left, matches, details);
                  matchst( first_word+node.key, node.middle, matches, details);
@@ -240,7 +230,7 @@ public class TST {
                  {
                      first_word += node.key;
                      matches.add(first_word);
-                     details.add(node.stop_info.details);
+                     details.add(node.stop_details.details);
                  }
          }
     }
@@ -258,7 +248,7 @@ public class TST {
 
             Scanner scanner = new Scanner(file);
             String current_line = "";
-            String stop_id, stop_name, first_word;
+            String stop_name, first_word;
 
             while (scanner.hasNextLine() ){
 
@@ -287,7 +277,7 @@ public class TST {
                     stop_name = stop_name.substring(9).concat(" FLAGSTOP");
                 }
 
-                StopInfo newInfo = new StopInfo(stop_details);
+                StopDetails newInfo = new StopDetails(stop_details);
                 add(stop_name.toCharArray(), newInfo);
                 tokenizer.close();
             }
