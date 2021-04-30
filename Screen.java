@@ -27,7 +27,6 @@ public class Screen
 	private JComboBox<Object> busStopInput;
 	private JComboBox<Object> startInput;
 	private JComboBox<Object> endInput;
-	private JLabel toLabel;
 	private JSpinner timeSelecter;
 	private JButton goButton;
 	private JButton goTimeButton;
@@ -35,6 +34,7 @@ public class Screen
 	private JTable table;
 	private JTable timeTable;
 	private JTable busTable;
+	private JLabel tripCostLabel;
 	
 	private static final String columnNames[] = {"ID", "Code", "Name", "Desc", "Latitude", "Longitude", "Zone ID", "URL", "Type", "Parent Station"};
 	
@@ -52,7 +52,7 @@ public class Screen
 		startInput.addActionListener(new startListener());
 		topPanel.add(startInput);
 		
-		toLabel = new JLabel("to");
+		JLabel toLabel = new JLabel("to");
 		topPanel.add(toLabel);
 		
 		endInput = new JComboBox<Object>(stopStr);
@@ -64,6 +64,12 @@ public class Screen
 		goButton = new JButton("go!");
 		goButton.addActionListener(new buttonListener());
 		topPanel.add(goButton);
+		
+		JPanel costPanel = new JPanel();
+		JLabel costLabel = new JLabel("cost: ");
+		costPanel.add(costLabel);
+		tripCostLabel = new JLabel("--");
+		costPanel.add(tripCostLabel);
 		
 		String columnNames[] = {"Stop", "trip id", "stop #", "time"};
 		Object data[][] = {
@@ -81,6 +87,7 @@ public class Screen
 		tripSearchPanel.setLayout(new BoxLayout(tripSearchPanel, BoxLayout.Y_AXIS));
 		topPanel.setSize(500, 20);
 		tripSearchPanel.add(topPanel);
+		tripSearchPanel.add(costPanel);
 		tablePanel.setSize(500, 450);
 		tripSearchPanel.add(tablePanel);
 		
@@ -159,11 +166,13 @@ public class Screen
 			System.out.println("endStop: " + endStop);
 			
 			Object result[] = pathFinder.findPath(startStop, endStop).toArray();
-			Object data[][] = new Object[result.length][10];
-			for (int i = 0; i < result.length; i++)
+			double cost = (double) result[0];
+			tripCostLabel.setText(String.valueOf(cost));
+			Object data[][] = new Object[result.length-1][10];
+			for (int i = 1; i < result.length; i++)
 			{
 				try {
-					data[i] = getStopInfo(((Double) result[i]).intValue());
+					data[i-1] = getStopInfo(((Double) result[i]).intValue());
 				} catch (FileNotFoundException e1) {
 					e1.printStackTrace();
 				}
