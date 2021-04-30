@@ -1,10 +1,16 @@
+package uiDesign;
+
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
-import java.util.Collections;
+//import java.util.Collections;
 import java.util.Scanner;
 
 public class shortestPath {
@@ -15,12 +21,13 @@ public class shortestPath {
     
     /**
      * @throws IOException 
+     * @throws ClassNotFoundException 
      */
-    shortestPath() throws IOException{
+    shortestPath() throws IOException, ClassNotFoundException{
     	File stops, stopTimes, transfers;
-    	stops = new File("src/stops.txt");
-    	stopTimes = new File("src/stop_times.txt");
-    	transfers = new File("src/transfers.txt");
+    	stops = new File("stops.txt");
+    	stopTimes = new File("stop_times.txt");
+    	transfers = new File("transfers.txt");
     	
     	//-1s here, as all input files have a header
     	this.V = numberOfLines(stops) - 1;
@@ -75,7 +82,7 @@ public class shortestPath {
     		int to = conversions.indexOf(Integer.parseInt(tranScanner.next()));
     		int transType = (int) tranScanner.nextDouble();
     		if(transType == 2) {
-    			graph[from][to] = ((conversions.indexOf(Integer.parseInt(tranScanner.nextLine().replace(',', ' ').strip()))) / 100.0);
+    			graph[from][to] = ((conversions.indexOf(Integer.parseInt(tranScanner.nextLine().replace(',', ' ').trim()))) / 100.0);
     		}
     		else if(transType == 0) {
     			graph[from][to] = 2;
@@ -118,24 +125,45 @@ public class shortestPath {
     			paths[i][j] = j;
     		}
     	}
-    	
-    	System.out.println("Warshalling Floyds...");
-    	for (int k = 0; k < V; k++)
+    	File graphFile = new File("graph.txt");
+    	File pathsFile = new File("paths.txt");
+    	if (graphFile.exists() && pathsFile.exists())
     	{
-    		if(k % 100 == 0) {System.out.println(k + " / " + V); }
-        	for (int i = 0; i < V; i++)
-        	{
-        		for (int j = 0; j < V; j++)
-                {
-        			if (graph[i][k] + graph[k][j] < graph[i][j]) {
-        				graph[i][j] = graph[i][k] + graph[k][j]; // Cost(i to j) now Cost(i to k) + Cost(k to j) 
-        				paths[i][j] = k; //Path from (i to j), now goes (i to k to j)
-        			}
-                }
-            }
-        }	
-    	System.out.println("Floyds Wharshalled!");
-    	
+    		System.out.println("retrieving graph files...");
+    		ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream("graph.txt"));
+    		graph = (double[][])inputStream.readObject();
+    		inputStream.close();
+    		inputStream = new ObjectInputStream(new FileInputStream("paths.txt"));
+    		paths = (int[][])inputStream.readObject();
+    		inputStream.close();
+    		System.out.println("graph files retrieved");
+    	} else {
+	    	System.out.println("Warshalling Floyds...");
+	    	for (int k = 0; k < V; k++)
+	    	{
+	    		if(k % 100 == 0) {System.out.println(k + " / " + V); }
+	        	for (int i = 0; i < V; i++)
+	        	{
+	        		for (int j = 0; j < V; j++)
+	                {
+	        			if (graph[i][k] + graph[k][j] < graph[i][j]) {
+	        				graph[i][j] = graph[i][k] + graph[k][j]; // Cost(i to j) now Cost(i to k) + Cost(k to j) 
+	        				paths[i][j] = k; //Path from (i to j), now goes (i to k to j)
+	        			}
+	                }
+	            }
+	        }
+	    	System.out.println("Floyds Wharshalled!");
+	    	
+	    	System.out.println("generating files...");
+	    	ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream("graph.txt"));
+	    	outputStream.writeObject(graph);
+	    	outputStream.close();
+	    	outputStream = new ObjectOutputStream(new FileOutputStream("paths.txt"));
+	    	outputStream.writeObject(paths);
+	    	outputStream.close();
+	    	System.out.println("files generated");
+    	}
     }
 
     /**
