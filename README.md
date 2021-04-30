@@ -10,6 +10,7 @@ CSU 22012 Data Structures and Algorithms group project
 ## Individual Contributions:
 ### Emmet Morrin
 UI design and implementation
+
 Combining everyones work into final project
 
 ### Emmet McDonald
