@@ -1,3 +1,5 @@
+package uiDesign;
+
 import java.io.*;
 import java.util.*;
 import java.io.BufferedReader;
@@ -5,7 +7,7 @@ import java.io.BufferedReader;
 public class allTrips {
     public static String[][] searchAllTrips(int searchColumnIndex, String searchString) throws IOException {
 
-        BufferedReader br = new BufferedReader(new FileReader("inputs/stop_times.txt"));
+        BufferedReader br = new BufferedReader(new FileReader("stop_times.txt"));
         String line;
 
         ArrayList<Trip> tripsFound = new ArrayList<>();
