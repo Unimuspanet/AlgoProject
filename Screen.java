@@ -139,7 +139,7 @@ public class Screen
 		tabbedPane.addTab("Trip Search", null, tripSearchPanel, "Search for the shortest trip between two stops");
 		tabbedPane.addTab("Stop Search", null, busSearchPanel, "Search for information about a particular stop");
 		tabbedPane.addTab("Time Search", null, timeSearchPanel, "Search for stop changes based on a time");
-		tabbedPane.addTab("Console", null, consoleScrollPane, "");
+		tabbedPane.addTab("Console", null, consoleScrollPane, null);
 	}
 	
 	private class CustomOutputStream extends OutputStream {
@@ -304,7 +304,7 @@ public class Screen
 	{
 		tst = new TST("stops.txt");
 		Screen gui = new Screen();
-		frame = new JFrame("Bus Transfer System");
+		frame = new JFrame("Transport System");
 		
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(new GridLayout());
