@@ -160,17 +160,16 @@ public class Screen
 	
 	private class buttonListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
-			int startStop = Integer.parseInt((String) startInput.getSelectedItem());
-			int endStop = Integer.parseInt((String) endInput.getSelectedItem());
-			System.out.println("startStop: " + startStop);
-			System.out.println("endStop: " + endStop);
+			String startStop = tst.getStopId((String) startInput.getSelectedItem());
+			String endStop = tst.getStopId((String) endInput.getSelectedItem());
 			
-			Object result[] = pathFinder.findPath(startStop, endStop).toArray();
+			Object result[] = pathFinder.findPath(Integer.parseInt(startStop), Integer.parseInt(endStop)).toArray();
 			double cost = (double) result[0];
 			tripCostLabel.setText(String.valueOf(cost));
 			Object data[][] = new Object[result.length-1][10];
 			for (int i = 1; i < result.length; i++)
 			{
+				System.out.println(String.valueOf(((Double) result[i]).intValue()));
 				try {
 					data[i-1] = getStopInfo(((Double) result[i]).intValue());
 				} catch (FileNotFoundException e1) {
@@ -193,7 +192,8 @@ public class Screen
 		{
 			Object data[];
 			try {
-				data = getStopInfo(Integer.parseInt((String) busStopInput.getSelectedItem()));
+				String stop = tst.getStopId((String) busStopInput.getSelectedItem());
+				data = getStopInfo(Integer.parseInt(stop));
 				setBusTableInformation(new Object[][] { data });
 			} catch (NumberFormatException | FileNotFoundException e1) {
 				e1.printStackTrace();
@@ -206,7 +206,7 @@ public class Screen
 			if (e.getActionCommand() == "comboBoxEdited")
 			{
 				String searchItem = ((String) startInput.getSelectedItem()).toUpperCase();
-				ArrayList<String> result = tst.search(searchItem);
+				ArrayList<String> result = tst.searchForNames(searchItem);
 				result.add(0, searchItem);
 				setStartData(result.toArray());
 				startInput.showPopup();
@@ -219,7 +219,7 @@ public class Screen
 			if (e.getActionCommand() == "comboBoxEdited")
 			{
 				String searchItem = ((String) endInput.getSelectedItem()).toUpperCase();
-				ArrayList<String> result = tst.search(searchItem);
+				ArrayList<String> result = tst.searchForNames(searchItem);
 				result.add(0, searchItem);
 				setEndData(result.toArray());
 				endInput.showPopup();
@@ -232,7 +232,7 @@ public class Screen
 			if (e.getActionCommand() == "comboBoxEdited")
 			{
 				String searchItem = ((String) busStopInput.getSelectedItem()).toUpperCase();
-				ArrayList<String> result = tst.search(searchItem);
+				ArrayList<String> result = tst.searchForNames(searchItem);
 				result.add(0, searchItem);
 				setBusStopData(result.toArray());
 				busStopInput.showPopup();
