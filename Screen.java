@@ -3,15 +3,19 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-//import java.awt.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Scanner;
 import javax.swing.*;
-//import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.DateFormatter;
 
 public class Screen
 {
 	private static TST tst;
+	private static shortestPath pathFinder;
 	
 	private static JFrame frame;
 	private JTabbedPane tabbedPane;
@@ -27,6 +31,8 @@ public class Screen
 	private JButton goTimeButton;
 	private JTable table;
 	private JTable timeTable;
+	
+	private static final String columnNames[] = {"ID", "Code", "Name", "Desc", "Latitude", "Longitude", "Zone ID", "URL", "Type", "Parent Station"};
 	
 	public Screen()
 	{
@@ -63,6 +69,7 @@ public class Screen
 		};
 		table = new JTable(data, columnNames);
 		JScrollPane scrollPane = new JScrollPane(table);
+		scrollPane.setPreferredSize(new Dimension(650, 400));
 		JPanel tablePanel = new JPanel();
 		tablePanel.add(scrollPane);
 		
@@ -109,11 +116,22 @@ public class Screen
 	
 	private class buttonListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
-			Object startStop = startInput.getSelectedItem();
-			Object endStop = endInput.getSelectedItem();
+			int startStop = Integer.parseInt((String) startInput.getSelectedItem());
+			int endStop = Integer.parseInt((String) endInput.getSelectedItem());
 			System.out.println("startStop: " + startStop);
 			System.out.println("endStop: " + endStop);
-			// TODO: interface with rest of program
+			
+			Object result[] = pathFinder.findPath(startStop, endStop).toArray();
+			Object data[][] = new Object[result.length][10];
+			for (int i = 0; i < result.length; i++)
+			{
+				try {
+					data[i] = getStopInfo(((Double) result[i]).intValue());
+				} catch (FileNotFoundException e1) {
+					e1.printStackTrace();
+				}
+			}
+			setTableInformation(data, columnNames);
 		}
 	}
 	
@@ -129,8 +147,9 @@ public class Screen
 			if (e.getActionCommand() == "comboBoxEdited")
 			{
 				String searchItem = ((String) startInput.getSelectedItem()).toUpperCase();
-				Object result[] = tst.search(searchItem).toArray();
-				setStartData(result);
+				ArrayList<String> result = tst.search(searchItem);
+				result.add(0, searchItem);
+				setStartData(result.toArray());
 				startInput.showPopup();
 			}
 		}
@@ -141,8 +160,9 @@ public class Screen
 			if (e.getActionCommand() == "comboBoxEdited")
 			{
 				String searchItem = ((String) endInput.getSelectedItem()).toUpperCase();
-				Object result[] = tst.search(searchItem).toArray();
-				setEndData(result);
+				ArrayList<String> result = tst.search(searchItem);
+				result.add(0, searchItem);
+				setEndData(result.toArray());
 				endInput.showPopup();
 			}
 		}
@@ -153,9 +173,9 @@ public class Screen
 			if (e.getActionCommand() == "comboBoxEdited")
 			{
 				String searchItem = ((String) busStopInput.getSelectedItem()).toUpperCase();
-				System.out.println("get stop of [" + searchItem + "]");
-				Object result[] = tst.search(searchItem).toArray();
-				setBusStopData(result);
+				ArrayList<String> result = tst.search(searchItem);
+				result.add(0, searchItem);
+				setBusStopData(result.toArray());
 				busStopInput.showPopup();
 			}
 		}
@@ -193,7 +213,28 @@ public class Screen
 		busStopInput.setModel(model);
 	}
 	
-	public static void main(String[] args)
+	public static Object[] getStopInfo(int stopId) throws FileNotFoundException
+	{
+		Object result[] = new Object[10];
+		File stopsFile = new File("stops.txt");
+		Scanner scanner = new Scanner(stopsFile);
+		while (scanner.hasNextLine())
+		{
+			String line = scanner.nextLine();
+			String lineSplit[] = line.split(",");
+			if (lineSplit[0].equals(String.valueOf(stopId)))
+			{
+				System.out.println("found it");
+				System.out.println(line);
+				result = lineSplit;
+				break;
+			}
+		}
+		scanner.close();
+		return result;
+	}
+	
+	public static void main(String[] args) throws IOException, ClassNotFoundException
 	{
 		tst = new TST("stops.txt");
 		Screen gui = new Screen();
@@ -204,13 +245,14 @@ public class Screen
 		frame.pack();
 		frame.setVisible(true);
 		
-		String columnNames[] = {"Stop", "trip id", "stop #", "time", "new info"};
-		Object data[][] = {
-			{ 646, "9017927", 1, "5:25:00", 12 },
-			{ 378, "9017927", 2, "5:25:50", "12" },
-			{ 379, "9017927", 3, "5:26:28", "newinfo" }
-		};
+		Object data[][] = {};
 		gui.setTableInformation(data, columnNames);
-		//gui.setStopData(columnNames);
+		
+		pathFinder = new shortestPath();
+		//System.out.println("got here");
+		//System.out.println(pathFinder.tracePath(1888, 11940));
+		//System.out.println(pathFinder.findPath(1888, 11940));
+		getStopInfo(1279);
+		System.out.println("here");
 	}
 }  
