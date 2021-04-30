@@ -1,8 +1,5 @@
 import java.io.*;
-import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.Scanner;
-import java.util.ArrayList;
+import java.util.*;
 import java.io.BufferedReader;
 
 public class allTrips {
@@ -11,31 +8,22 @@ public class allTrips {
         BufferedReader br = new BufferedReader(new FileReader("inputs/stop_times.txt"));
         String line;
 
-        ArrayList<String[]> tripsFound = new ArrayList<>();
-        while ( (line = br.readLine()) != null ) {
-            String[] values = line.split(",");
+        ArrayList<Trip> tripsFound = new ArrayList<>();
+        while ( (line = br.readLine()) != null ) {                          //searches stop_times.txt with arrival time given by user and returns
+            String[] values = line.split(",");                        // the full line where a matching arrival time is found
             if(values[searchColumnIndex].equals(searchString)) {
                 String foundTrip = line;
                 String[] trip = foundTrip.split(",");
-                tripsFound.add(trip);
-
-
+                tripsFound.add(new Trip(trip));
             }
         }
-        String[][] arrayForEmmet = new String[tripsFound.size()][8];
-        int count = 0;
+        Collections.sort(tripsFound, new SortByID());
+        String[][] arrayForEmmet = new String[tripsFound.size()][];
         for(int i = 0; i<tripsFound.size(); i++){
-            String[] arrayToTransfer = tripsFound.get(i);
-            for(int j = 0; j<8; j++){
-                arrayForEmmet[count][j] = arrayToTransfer[j];
-            }
-            count++;
+                arrayForEmmet[i] = tripsFound.get(i).toArray();
         }
         br.close();
-        String[] headers = {"Trip Id","Arrival Time","Departure time","Stop id","Stop Sequence","Stop Headsign","Pickup Type","Drop off Type","Shape Dist Traveled"};
+
         return arrayForEmmet;
-
     }
-
-
-}
+  }
