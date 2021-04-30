@@ -40,7 +40,8 @@ public class Screen
 	private JLabel tripCostLabel;
 	
 	private static final String columnNames[] = {"ID", "Code", "Name", "Desc", "Latitude", "Longitude", "Zone ID", "URL", "Type", "Parent Station"};
-	
+	private static final String timeHeaders[] = {"Trip Id","Arrival Time","Departure time","Stop id","Stop Sequence","Stop Headsign","Pickup Type","Drop off Type","Shape Dist Traveled"};
+
 	public Screen()
 	{
 		String startStr[] = {"Stop from"};
@@ -123,7 +124,7 @@ public class Screen
 		goTimeButton.addActionListener(new timeButtonListener());
 		timeTopPanel.add(goTimeButton);
 		
-		timeTable = new JTable(data, columnNames);
+		timeTable = new JTable(new String[][] {}, timeHeaders);
 		JScrollPane timeScrollPane = new JScrollPane(timeTable);
 		
 		timeSearchPanel = new JPanel();
@@ -266,8 +267,7 @@ public class Screen
 	
 	public void setTimeTableInformation(Object data[][])
 	{
-		String[] headers = {"Trip Id","Arrival Time","Departure time","Stop id","Stop Sequence","Stop Headsign","Pickup Type","Drop off Type","Shape Dist Traveled"};
-		DefaultTableModel model = new DefaultTableModel(data, headers);
+		DefaultTableModel model = new DefaultTableModel(data, timeHeaders);
 		timeTable.setModel(model);
 		model.fireTableDataChanged();
 	}
