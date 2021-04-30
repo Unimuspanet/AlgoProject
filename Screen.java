@@ -132,8 +132,8 @@ public class Screen
 		textArea.setEditable(false);
 		PrintStream printStream = new PrintStream(new CustomOutputStream(textArea));
 		System.setOut(printStream);
-        System.setErr(printStream);
-        JScrollPane consoleScrollPane = new JScrollPane(textArea);
+		System.setErr(printStream);
+		JScrollPane consoleScrollPane = new JScrollPane(textArea);
 		
 		tabbedPane = new JTabbedPane();
 		tabbedPane.addTab("Trip Search", null, tripSearchPanel, "Search for the shortest trip between two stops");
