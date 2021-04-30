@@ -28,6 +28,7 @@ All trips search algorithm
 * Download Runnable Jar file from ./Algo program/Algo.jar
 * Save inside folder with given stops.txt, transfers.txt, and stop_times.txt
 * run Algo.jar, for first time setup, let it run without stopping, you can see when this step is done in the console tab
-  this step can take upwards of 10-15 minutes
+  
+  This step can take upwards of 10-15 minutes
 * After its done generating the floyd warshall graph, the result is saved in graph.txt and paths.txt
 * On subsequent boot startups, the program will be ready to run after only 10-15 seconds.
