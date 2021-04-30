@@ -13,7 +13,9 @@ UI design and implementation
 
 Combining everyones work into final project
 
-Design document
+README file
+
+Design document - UI Design
 
 ### Emmet McDonald
 Shortest Path algorithm
