@@ -6,6 +6,8 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Scanner;
 import javax.swing.*;
@@ -29,8 +31,10 @@ public class Screen
 	private JSpinner timeSelecter;
 	private JButton goButton;
 	private JButton goTimeButton;
+	private JButton goStopButton;
 	private JTable table;
 	private JTable timeTable;
+	private JTable busTable;
 	
 	private static final String columnNames[] = {"ID", "Code", "Name", "Desc", "Latitude", "Longitude", "Zone ID", "URL", "Type", "Parent Station"};
 	
@@ -82,10 +86,19 @@ public class Screen
 		
 		busSearchPanel = new JPanel();
 		busStopInput = new JComboBox<Object>(busStopStr);
+		busStopInput.setPreferredSize(new Dimension(300, 25));
 		busStopInput.setEditable(true);
 		busStopInput.addActionListener(new busStopListener());
-		busSearchPanel.setLayout(new GridLayout(4, 0));
-		busSearchPanel.add(busStopInput);
+		goStopButton = new JButton("go!");
+		goStopButton.addActionListener(new stopButtonListener());
+		JPanel busTopPanel = new JPanel();
+		busTopPanel.add(busStopInput);
+		busTopPanel.add(goStopButton);
+		busSearchPanel.setLayout(new BoxLayout(busSearchPanel, BoxLayout.Y_AXIS));
+		busSearchPanel.add(busTopPanel);
+		busTable = new JTable(new String[][] {{"", "", "", "", "", "", "", "", "", ""}}, Screen.columnNames);
+		JScrollPane busScrollPane = new JScrollPane(busTable);
+		busSearchPanel.add(busScrollPane);
 		
 		SpinnerDateModel model = new SpinnerDateModel();
 		timeSelecter = new JSpinner(model);
@@ -108,10 +121,34 @@ public class Screen
 		timeSearchPanel.add(timeTopPanel);
 		timeSearchPanel.add(timeScrollPane);
 		
+		JTextArea textArea = new JTextArea();
+		textArea.setEditable(false);
+		PrintStream printStream = new PrintStream(new CustomOutputStream(textArea));
+		System.setOut(printStream);
+        System.setErr(printStream);
+        JScrollPane consoleScrollPane = new JScrollPane(textArea);
+		
 		tabbedPane = new JTabbedPane();
 		tabbedPane.addTab("Trip Search", null, tripSearchPanel, "Search for the shortest trip between two stops");
-		tabbedPane.addTab("Bus Stop Search", null, busSearchPanel, "Search for information about a particular bus stop");
+		tabbedPane.addTab("Stop Search", null, busSearchPanel, "Search for information about a particular stop");
 		tabbedPane.addTab("Time Search", null, timeSearchPanel, "Search for stop changes based on a time");
+		tabbedPane.addTab("Console", null, consoleScrollPane, "");
+	}
+	
+	private class CustomOutputStream extends OutputStream {
+	    private JTextArea textArea;
+	     
+	    public CustomOutputStream(JTextArea textArea) {
+	        this.textArea = textArea;
+	    }
+	     
+	    @Override
+	    public void write(int b) throws IOException {
+	        // redirects data to the text area
+	        textArea.append(String.valueOf((char)b));
+	        // scrolls the text area to the end of data
+	        textArea.setCaretPosition(textArea.getDocument().getLength());
+	    }
 	}
 	
 	private class buttonListener implements ActionListener {
@@ -139,6 +176,19 @@ public class Screen
 		public void actionPerformed(ActionEvent e) {
 			System.out.print(e);
 			// TODO: interface with rest of program
+		}
+	}
+	
+	private class stopButtonListener implements ActionListener {
+		public void actionPerformed(ActionEvent e)
+		{
+			Object data[];
+			try {
+				data = getStopInfo(Integer.parseInt((String) busStopInput.getSelectedItem()));
+				setBusTableInformation(new Object[][] { data });
+			} catch (NumberFormatException | FileNotFoundException e1) {
+				e1.printStackTrace();
+			}
 		}
 	}
 	
@@ -195,6 +245,13 @@ public class Screen
 		model.fireTableDataChanged();
 	}
 	
+	public void setBusTableInformation(Object data[][])
+	{
+		DefaultTableModel model = new DefaultTableModel(data, columnNames);
+		busTable.setModel(model);
+		model.fireTableDataChanged();
+	}
+	
 	public void setStartData(Object data[])
 	{
 		DefaultComboBoxModel<Object> model = new DefaultComboBoxModel<Object>(data);
@@ -238,8 +295,9 @@ public class Screen
 	{
 		tst = new TST("stops.txt");
 		Screen gui = new Screen();
-		frame = new JFrame();
-
+		frame = new JFrame("Bus Transfer System");
+		
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(new GridLayout());
 		frame.getContentPane().add(gui.tabbedPane);
 		frame.pack();
@@ -249,10 +307,7 @@ public class Screen
 		gui.setTableInformation(data, columnNames);
 		
 		pathFinder = new shortestPath();
-		//System.out.println("got here");
-		//System.out.println(pathFinder.tracePath(1888, 11940));
-		//System.out.println(pathFinder.findPath(1888, 11940));
-		getStopInfo(1279);
-		System.out.println("here");
+		
+		System.out.println("Transport System online!");
 	}
 }  
