@@ -13,6 +13,8 @@ UI design and implementation
 
 Combining everyones work into final project
 
+Design document
+
 ### Emmet McDonald
 Shortest Path algorithm
 
