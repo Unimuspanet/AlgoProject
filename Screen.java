@@ -8,7 +8,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Scanner;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -182,8 +185,22 @@ public class Screen
 	
 	private class timeButtonListener implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
-			System.out.print(e);
-			// TODO: interface with rest of program
+			
+			Date time = (Date) timeSelecter.getValue();
+			DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+			String timeString = dateFormat.format(time);
+			if (timeString.charAt(0) == '0')
+			{
+				timeString = ' ' + timeString.substring(1);
+			}
+			System.out.println("searching for time [" + timeString + "]");
+			try {
+				String data[][] = allTrips.searchAllTrips(1, timeString);
+				setTimeTableInformation(data);
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+			System.out.println("time found");
 		}
 	}
 	
@@ -247,9 +264,10 @@ public class Screen
 		model.fireTableDataChanged();
 	}
 	
-	public void setTimeTableInformation(Object data[][], Object columnNames[])
+	public void setTimeTableInformation(Object data[][])
 	{
-		DefaultTableModel model = new DefaultTableModel(data, columnNames);
+		String[] headers = {"Trip Id","Arrival Time","Departure time","Stop id","Stop Sequence","Stop Headsign","Pickup Type","Drop off Type","Shape Dist Traveled"};
+		DefaultTableModel model = new DefaultTableModel(data, headers);
 		timeTable.setModel(model);
 		model.fireTableDataChanged();
 	}
